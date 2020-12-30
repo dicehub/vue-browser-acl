@@ -79,11 +79,7 @@ const VueAcl: VueAcl = {
         verbObject: string | null,
         ...otherArgs: any[]
       ) => {
-        return (
-          (verbObject &&
-            acl.can(userAccessor(), verb, verbObject, ...otherArgs)) ||
-          (!verbObject && !opt.strict)
-        )
+        return acl.can(userAccessor(), verb, verbObject || undefined, ...otherArgs)
       }
 
       /* convert 'edit Post' to ['edit', 'Post'] */

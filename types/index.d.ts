@@ -26,7 +26,7 @@ export type Options = {
 
 export type AclHelper = (
   verb: Verb,
-  verbObject: VerbObject,
+  verbObject?: VerbObject,
   ...args: any[]
 ) => boolean
 

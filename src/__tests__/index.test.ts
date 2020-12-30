@@ -1,5 +1,6 @@
 import { createLocalVue, mount, shallowMount } from '@vue/test-utils'
-import { User } from '../../types'
+import VueRouter, { Route } from 'vue-router';
+import { AclHelper, User } from '../../types'
 import Acl from 'browser-acl'
 import { Verb } from '../../types'
 import VueAcl from '../index'
@@ -108,6 +109,34 @@ describe('Global rules', () => {
     )
     expect(wrapper.html()).toContain(HIDDEN_STR)
   })
+  test('Should support global rules inside `can` meta property', async () => {
+    const localVue = createLocalVue()
+    localVue.use(VueRouter)
+    const router = new VueRouter({
+      routes: [
+        {
+          name: 'create',
+          path: '/create',
+          meta: {
+            can(to: Route, from: Route, can: AclHelper) {
+              return can('create')
+            }
+          }
+        },
+      ]
+    });
+    let called = false;
+    localVue.use(VueAcl, {}, (acl: Acl) => {
+      acl.rule('create', () => {
+        called = true;
+        return true;
+      })
+    }, { router })
+    expect(router.currentRoute.path).toBe('/')
+    await router.push({ name: 'create' })
+    expect(router.currentRoute.path).toBe('/create')
+    expect(called).toBe(true);
+})
 })
 describe('Simple rules', () => {
   test('Can edit if owner: false', () => {
